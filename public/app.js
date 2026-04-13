@@ -42,7 +42,7 @@ const tooltipEl = document.createElement('div');
 tooltipEl.className = 'node-tooltip';
 DOM.canvasContainer.appendChild(tooltipEl);
 
-// All 6 Professional Node Icons
+// Professional Node Icons
 const NodeIcons = {
     start: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M10 8l6 4-6 4V8z" fill="currentColor"></path></svg>`,
     end: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><rect x="9" y="9" width="6" height="6" fill="currentColor"></rect></svg>`,
@@ -149,7 +149,6 @@ document.getElementById('undo-btn').onclick = undo;
 document.getElementById('redo-btn').onclick = redo;
 
 document.addEventListener('keydown', (e) => {
-    // Prevent actions if typing in an input field
     if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
 
     if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
@@ -326,7 +325,41 @@ function applyTransform() {
     updateMinimap();
 }
 
+// --- Custom Input Modal State ---
+let pendingAction = null;
 
+function openNameModal(title, label, actionData) {
+    document.getElementById('name-input-title').innerText = title;
+    document.getElementById('name-input-label').innerText = label;
+    document.getElementById('name-input-field').value = '';
+    pendingAction = actionData;
+    document.getElementById('name-input-modal').classList.add('active');
+    document.getElementById('name-input-field').focus();
+}
+
+document.getElementById('save-name-btn').onclick = () => {
+    const name = document.getElementById('name-input-field').value.trim();
+    if (!name) return;
+
+    if (pendingAction.type === 'project') {
+        workspaceData.projects.push({ id: Date.now().toString(), name, workflows: [] });
+    } else if (pendingAction.type === 'workflow') {
+        workspaceData.projects.find(p => p.id === pendingAction.parentId).workflows.push({ id: Date.now().toString(), name, nodes: [], edges: [] });
+    }
+    
+    document.getElementById('name-input-modal').classList.remove('active');
+    broadcastUpdate();
+    renderSidebar();
+};
+
+document.getElementById('name-input-field').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') document.getElementById('save-name-btn').click();
+});
+
+// --- IDE Sidebar Rendering ---
+document.getElementById('add-project-btn').addEventListener('click', () => {
+    openNameModal("New Project", "Project Name", { type: 'project' });
+});
 
 window.deleteProject = (e, projId) => {
     e.stopPropagation();
@@ -359,54 +392,14 @@ function clearWorkspace() {
     renderCanvas();
 }
 
-// --- Custom Input Modal State ---
-let pendingAction = null;
-
-function openNameModal(title, label, actionData) {
-    document.getElementById('name-input-title').innerText = title;
-    document.getElementById('name-input-label').innerText = label;
-    document.getElementById('name-input-field').value = '';
-    pendingAction = actionData;
-    document.getElementById('name-input-modal').classList.add('active');
-    document.getElementById('name-input-field').focus();
-}
-
-// Add Project Trigger
-document.getElementById('add-project-btn').addEventListener('click', () => {
-    openNameModal("New Project", "Project Name", { type: 'project' });
-});
-
-// Add Workflow Trigger
 window.addWorkflow = (e, projId) => {
     e.stopPropagation();
     openNameModal("New Workflow", "Workflow Name", { type: 'workflow', parentId: projId });
 };
 
-// Handle Save Button inside the custom modal
-document.getElementById('save-name-btn').onclick = () => {
-    const name = document.getElementById('name-input-field').value.trim();
-    if (!name) return;
-
-    if (pendingAction.type === 'project') {
-        workspaceData.projects.push({ id: Date.now().toString(), name, workflows: [] });
-    } else if (pendingAction.type === 'workflow') {
-        workspaceData.projects.find(p => p.id === pendingAction.parentId).workflows.push({ id: Date.now().toString(), name, nodes: [], edges: [] });
-    }
-    
-    document.getElementById('name-input-modal').classList.remove('active');
-    broadcastUpdate();
-    renderSidebar();
-};
-
-// Allow pressing "Enter" key to submit the modal
-document.getElementById('name-input-field').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') document.getElementById('save-name-btn').click();
-});
-
 function renderSidebar() {
     DOM.projectList.innerHTML = '';
     
-    // SVG Templates for Sidebar
     const folderIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>`;
     const fileIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>`;
     const trashIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
@@ -516,6 +509,7 @@ function renderCanvas() {
         let statusHtml = node.status && node.status !== 'none' ? `<div class="node-status-badge status-${node.status}">${node.status}</div>` : '';
         el.innerHTML = `${statusHtml}<div class="icon">${NodeIcons[node.type]}</div><span class="label">${node.label}</span>`;
         
+        // Tooltip Event
         el.addEventListener('mouseenter', () => {
             if (dragState.isDragging || connectionState.isConnecting) return;
             let html = '';
@@ -532,6 +526,7 @@ function renderCanvas() {
         
         el.addEventListener('mouseleave', () => tooltipEl.classList.remove('visible'));
         
+        // Connectors Setup
         ['top', 'right', 'bottom', 'left'].forEach(pos => {
             const port = document.createElement('div');
             port.className = `connector ${pos}`;
@@ -545,17 +540,13 @@ function renderCanvas() {
             port.onmouseup = (e) => {
                 e.stopPropagation();
                 if (connectionState.isConnecting && connectionState.fromNode !== node.id) {
-                    let label = '';
-                    if (nodes.find(n => n.id === connectionState.fromNode).type === 'decision') {
-                        label = confirm("Is this the 'Yes' path?") ? 'Yes' : 'No';
-                    }
                     edges.push({
                         id: 'edge_' + Date.now(),
                         from: connectionState.fromNode,
                         fromPort: connectionState.fromPort,
                         to: node.id,
                         toPort: pos,
-                        label: label
+                        label: ''
                     });
                     renderCanvas();
                     broadcastUpdate();
@@ -565,6 +556,7 @@ function renderCanvas() {
             el.appendChild(port);
         });
         
+        // Node Click & Drag Selection Logic
         el.onmousedown = (e) => {
             if (e.target.classList.contains('connector')) return;
             
@@ -592,6 +584,7 @@ function renderCanvas() {
             };
         };
         
+        // Open Modal
         el.ondblclick = (e) => {
             e.stopPropagation();
             openModal(node.id);
@@ -820,6 +813,7 @@ document.getElementById('save-edge-btn').onclick = () => {
     broadcastUpdate();
 };
 
+// Image Export
 document.getElementById('export-trigger-btn').addEventListener('click', () => {
     if (!activeWorkflowId) return alert("Please open a workflow to export.");
     document.getElementById('export-modal').classList.add('active');
@@ -869,4 +863,30 @@ document.getElementById('save-btn').addEventListener('click', () => {
     setTimeout(() => btn.textContent = "Force Save", 2000);
 });
 
+// --- Mobile Responsiveness Logic ---
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const sidebarEl = document.querySelector('.sidebar');
+
+if (mobileMenuBtn && sidebarEl) {
+    mobileMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebarEl.classList.toggle('open');
+    });
+
+    DOM.canvas.addEventListener('mousedown', () => {
+        if (window.innerWidth <= 768 && sidebarEl.classList.contains('open')) {
+            sidebarEl.classList.remove('open');
+        }
+    });
+
+    const originalLoadWorkflow = loadWorkflow;
+    window.loadWorkflow = function(projId, wfId) {
+        originalLoadWorkflow(projId, wfId);
+        if (window.innerWidth <= 768) {
+            sidebarEl.classList.remove('open');
+        }
+    };
+}
+
+// Start Application
 loadData();

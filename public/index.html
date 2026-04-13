@@ -21,6 +21,10 @@
 
         <main class="workspace">
             <header class="toolbar">
+                <button id="mobile-menu-btn" class="btn-icon mobile-only" title="Menu">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+
                 <div id="current-path" class="breadcrumb">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
                     <span>Select a workflow...</span>
@@ -80,6 +84,23 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <div id="name-input-modal" class="modal-overlay">
+        <div class="modal compact-modal">
+            <div class="modal-header">
+                <h3 id="name-input-title">Enter Name</h3>
+                <button class="close-btn" data-target="name-input-modal">&times;</button>
+            </div>
+            <div class="modal-body form-compact">
+                <label id="name-input-label">Name</label>
+                <input type="text" id="name-input-field" placeholder="Type here...">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-ghost close-btn" data-target="name-input-modal">Cancel</button>
+                <button id="save-name-btn" class="btn-primary">Create</button>
+            </div>
+        </div>
     </div>
 
     <div id="export-modal" class="modal-overlay">
@@ -168,27 +189,13 @@
                     <li><strong>Connections:</strong> Click and drag from the colored dots on the edge of one node to another.</li>
                     <li><strong>Multi-Select:</strong> Hold <code>Shift</code> and drag on the canvas to draw a selection box.</li>
                     <li><strong>Edit Node/Connector:</strong> Double-click any node OR connector line to open its edit menu (Delete, Label, Comments).</li>
+                    <li><strong>Keyboard Delete:</strong> Select a node (or multiple) and press <code>Delete</code> or <code>Backspace</code>.</li>
                     <li><strong>Undo/Redo:</strong> Use the toolbar buttons or <code>Ctrl+Z</code> / <code>Ctrl+Y</code>.</li>
                 </ul>
             </div>
         </div>
     </div>
-<div id="name-input-modal" class="modal-overlay">
-        <div class="modal compact-modal">
-            <div class="modal-header">
-                <h3 id="name-input-title">Enter Name</h3>
-                <button class="close-btn" data-target="name-input-modal">&times;</button>
-            </div>
-            <div class="modal-body form-compact">
-                <label id="name-input-label">Name</label>
-                <input type="text" id="name-input-field" placeholder="Type here...">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-ghost close-btn" data-target="name-input-modal">Cancel</button>
-                <button id="save-name-btn" class="btn-primary">Create</button>
-            </div>
-        </div>
-    </div>
+
     <script src="app.js"></script>
 </body>
 </html>

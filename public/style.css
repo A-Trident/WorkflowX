@@ -39,7 +39,7 @@ body { background: var(--bg-dark); color: var(--text-main); height: 100vh; overf
 .layout { display: flex; height: 100%; }
 
 /* --- Sidebar IDE Tree Polish --- */
-.sidebar { width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; transition: background 0.3s; }
+.sidebar { width: 260px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; transition: background 0.3s, transform 0.3s ease; }
 .sidebar-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 .sidebar-header h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); }
 .tree-view { list-style: none; padding: 10px; overflow-y: auto; }
@@ -106,9 +106,9 @@ body { background: var(--bg-dark); color: var(--text-main); height: 100vh; overf
 .node[data-type="process"] { border-top: 3px solid var(--accent); border-radius: 4px; }
 .node[data-type="decision"] { border-top: 3px solid #FF9F0A; border-radius: 4px; }
 .node[data-type="input"] { border-top: 3px solid #38bdf8; transform: skewX(-5deg); }
-.node[data-type="input"] > * { transform: skewX(5deg); } /* Keeps text straight */
+.node[data-type="input"] > * { transform: skewX(5deg); } 
 .node[data-type="output"] { border-top: 3px solid #c084fc; transform: skewX(5deg); }
-.node[data-type="output"] > * { transform: skewX(-5deg); } /* Keeps text straight */
+.node[data-type="output"] > * { transform: skewX(-5deg); } 
 
 /* Context Nodes */
 .node-status-badge { position: absolute; top: -8px; right: -8px; font-size: 9px; padding: 2px 6px; border-radius: 10px; color: white; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.3); pointer-events: none; }
@@ -165,3 +165,46 @@ button, select { font-family: var(--font-apple); }
 
 .instructions-body ul { padding-left: 20px; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
 .instructions-body code { background: var(--border); padding: 2px 5px; border-radius: 3px; color: var(--text-main); }
+
+/* =========================================
+   RESPONSIVE DESIGN (Mobile & Tablet)
+========================================= */
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+    .mobile-only { display: flex; margin-right: 10px; }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 280px;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .toolbar {
+        flex-wrap: wrap;
+        padding: 10px;
+        gap: 10px;
+    }
+    #current-path { flex: 1; }
+    
+    .tools {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        justify-content: flex-start;
+        -ms-overflow-style: none;
+        scrollbar-width: none; 
+    }
+    .tools::-webkit-scrollbar { display: none; }
+    .tools .divider { display: none; } 
+
+    .modal { width: 95%; max-width: 400px; margin: 0 auto; }
+    .minimap { display: none !important; }
+    .node-tooltip { max-width: 200px; white-space: normal; }
+}
