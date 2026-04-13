@@ -890,3 +890,27 @@ if (mobileMenuBtn && sidebarEl) {
 
 // Start Application
 loadData();
+
+// Responsive helper: keep UI tidy on resize / initial load
+function handleResponsive() {
+    if (!sidebarEl) return;
+    if (window.innerWidth <= 768) {
+        sidebarEl.classList.remove('open');
+        document.body.classList.add('mobile');
+        if (DOM.toolbarTools) {
+            DOM.toolbarTools.style.width = '100%';
+            DOM.toolbarTools.style.overflowX = 'auto';
+        }
+    } else {
+        document.body.classList.remove('mobile');
+        if (DOM.toolbarTools) {
+            DOM.toolbarTools.style.width = '';
+            DOM.toolbarTools.style.overflowX = '';
+        }
+        // ensure sidebar isn't accidentally stuck open from mobile state
+        sidebarEl.classList.remove('open');
+    }
+}
+
+window.addEventListener('resize', handleResponsive);
+handleResponsive();

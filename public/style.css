@@ -208,3 +208,34 @@ button, select { font-family: var(--font-apple); }
     .minimap { display: none !important; }
     .node-tooltip { max-width: 200px; white-space: normal; }
 }
+
+/* Additional responsive refinements */
+/* Larger desktops */
+@media (min-width: 1200px) {
+    .sidebar { width: 320px; }
+    .node { min-width: 140px; }
+}
+
+/* Tablets */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .sidebar { width: 220px; }
+    .toolbar { padding: 8px 12px; }
+    .node { min-width: 110px; padding: 8px 12px; }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .toolbar { padding: 8px; }
+    .breadcrumb span { display: none; }
+    .node { min-width: 80px; padding: 8px 10px; font-size: 12px; }
+    .node .label { font-size: 10px; }
+    .modal { width: 96%; max-width: 360px; margin: 0 auto; }
+    .sidebar { width: 260px; }
+    .tools .node-tool { padding: 8px 10px; }
+}
+
+/* Make modals scrollable on small screens */
+.modal { max-height: calc(100vh - 40px); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* Better touch support for the canvas area */
+.canvas { touch-action: pan-x pan-y; -ms-touch-action: pan-x pan-y; }
