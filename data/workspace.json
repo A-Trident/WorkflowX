@@ -1,0 +1,67 @@
+{
+  "projects": [
+    {
+      "id": "1776085844574",
+      "name": "ABC",
+      "workflows": [
+        {
+          "id": "1776085852854",
+          "name": "GRC",
+          "nodes": [
+            {
+              "id": "node_1776085874266",
+              "type": "start",
+              "x": 345,
+              "y": 99,
+              "label": "START",
+              "notes": "",
+              "url": "",
+              "user": "",
+              "pass": ""
+            },
+            {
+              "id": "node_1776085880525",
+              "type": "process",
+              "x": 175,
+              "y": 215,
+              "label": "PROCESS",
+              "notes": "dasd",
+              "url": "dasdas",
+              "user": "dasda",
+              "pass": "dasadas"
+            },
+            {
+              "id": "node_1776086356902",
+              "type": "decision",
+              "x": 354,
+              "y": 322,
+              "label": "DECISION",
+              "notes": "",
+              "url": "",
+              "user": "",
+              "pass": ""
+            }
+          ],
+          "edges": [
+            {
+              "id": "edge_1776085883829",
+              "from": "node_1776085874266",
+              "fromPort": "bottom",
+              "to": "node_1776085880525",
+              "toPort": "top",
+              "label": ""
+            },
+            {
+              "id": "edge_1776086365041",
+              "from": "node_1776085880525",
+              "fromPort": "right",
+              "to": "node_1776086356902",
+              "toPort": "top",
+              "label": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
